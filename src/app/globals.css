@@ -1,0 +1,284 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* ---------------------------------------------------------------------------
+   Brand tokens — from the George's identity sheet (Syncore, Sept 2026)
+   --------------------------------------------------------------------------- */
+@theme {
+  --color-yellow: #f9b21d;
+  --color-yellow-deep: #e39d0a;
+  --color-yellow-soft: #fde7b3;
+  --color-graphite: #15181b;
+  --color-graphite-2: #1f2326;
+  --color-graphite-3: #2a2f34;
+  --color-slate: #3a4147;
+  --color-slate-2: #6b7278;
+  --color-paper: #f6f3ee;
+  --color-paper-2: #ede8df;
+  --color-paper-3: #e2dcd0;
+  --color-line: rgb(21 24 27 / 0.12);
+  --color-line-dark: rgb(246 243 238 / 0.14);
+
+  --font-display: var(--font-archivo-black), "Archivo Black", Impact, "Arial Black", sans-serif;
+  --font-label: var(--font-barlow-condensed), "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: var(--font-barlow), "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --breakpoint-xs: 30rem;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --shadow-card: 0 1px 2px rgb(21 24 27 / 0.06), 0 12px 32px -12px rgb(21 24 27 / 0.18);
+  --shadow-yellow: 0 12px 36px -10px rgb(249 178 29 / 0.55);
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    color-scheme: light;
+    --header-h: 5rem;
+  }
+
+  html {
+    scroll-behavior: auto; /* Lenis handles smoothing */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-graphite font-body antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-yellow);
+    color: var(--color-graphite);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-yellow);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+    text-wrap: balance;
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img, svg, video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+   --------------------------------------------------------------------------- */
+@utility container-x {
+  width: 100%;
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.125rem, 4.5vw, 3.5rem);
+}
+
+@utility section-y {
+  padding-block: clamp(4.5rem, 9vw, 8.5rem);
+}
+
+@utility eyebrow {
+  @apply font-label font-semibold uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.22em;
+  line-height: 1;
+}
+
+@utility display-xl {
+  @apply font-display uppercase;
+  font-size: clamp(2.625rem, 6.1vw, 5.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+@utility display-lg {
+  @apply font-display uppercase;
+  font-size: clamp(2.125rem, 5.2vw, 4.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+}
+
+@utility display-md {
+  @apply font-display uppercase;
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+@utility display-sm {
+  @apply font-display;
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+  line-height: 1.1;
+}
+
+@utility stat-num {
+  @apply font-display;
+  font-size: clamp(1.875rem, 5vw, 4.5rem);
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility text-outline {
+  -webkit-text-stroke: 1.5px currentColor;
+  color: transparent;
+}
+
+@utility hex-mark {
+  /* hex-nut glyph built from clip-path; used as bullets and marquee separators */
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  background: currentColor;
+  clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0% 50%);
+}
+
+@utility mask-fade-x {
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+@utility grain {
+  position: relative;
+}
+
+/* Yellow "highlighter" stroke under words inside headlines. Painted as a background so it
+   survives SplitText masking (no z-index games). */
+.hl {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 52%,
+    var(--color-yellow) 52%,
+    var(--color-yellow) 80%,
+    transparent 80%
+  );
+  padding-inline: 0.04em;
+  margin-inline: -0.04em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* SplitText masks need overflow hidden and a little breathing room for descenders */
+.split-mask .line,
+.split-mask .word {
+  will-change: transform;
+}
+
+/* Subtle diagonal stripe pattern (yellow tape) */
+.stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-graphite) 0 12px,
+    var(--color-yellow) 12px 24px
+  );
+}
+
+/* Dotted grid texture for dark sections */
+.dot-grid {
+  background-image: radial-gradient(rgb(246 243 238 / 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Hide scrollbars on horizontal scrollers */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Reduced motion: kill everything that could hide content */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Pre-hide reveal targets ONLY once JS has confirmed motion is allowed (set in SmoothScroll.tsx).
+   GSAP writes inline opacity/visibility, which overrides this. */
+html[data-motion="ok"] [data-reveal] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero intro — pure CSS so above-the-fold content paints before hydration (LCP).
+   Only runs when the inline script confirmed JS + motion; otherwise content is simply visible.
+   `--d` sets the per-element delay.
+   --------------------------------------------------------------------------- */
+@keyframes rise-in {
+  from { opacity: 0; translate: 0 24px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes mask-up {
+  from { translate: 0 115%; rotate: 2deg; }
+  to   { translate: 0 0; rotate: 0deg; }
+}
+@keyframes wipe-in {
+  from { clip-path: inset(8% 8% 8% 8% round 32px); scale: 1.06; }
+  to   { clip-path: inset(0 0 0 0 round 32px); scale: 1; }
+}
+@keyframes slide-left {
+  from { opacity: 0; translate: 40px 0; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+.mask-line {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+.mask-line > span {
+  display: inline-block;
+  transform-origin: 0% 100%;
+}
+
+html[data-motion="ok"] [data-css-reveal] {
+  animation: rise-in 1s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0s);
+}
+html[data-motion="ok"] .mask-line > span {
+  animation: mask-up 1.2s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0s);
+}
+html[data-motion="ok"] [data-css-wipe] {
+  animation: wipe-in 1.4s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0s);
+}
+html[data-motion="ok"] [data-css-slide] {
+  animation: slide-left 1s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* Decorative wordmark rendered as generated content so it isn't announced or contrast-checked as text */
+.wordmark-bg::before {
+  content: attr(data-text);
+}
