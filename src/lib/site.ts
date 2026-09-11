@@ -3,13 +3,38 @@
  * Change phone / email / hours / area / stats / reviews here — every section reads from this file.
  */
 
+/**
+ * Canonical site URL, in order of preference:
+ * NEXT_PUBLIC_SITE_URL → Vercel production domain → Vercel preview URL → hardcoded default.
+ * Blank values are ignored and a missing protocol is added, so a mis-set env var can't break the build.
+ */
+function resolveSiteUrl() {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    process.env.VERCEL_URL,
+    "https://georgeshandyman.com",
+  ];
+  for (const raw of candidates) {
+    const v = raw?.trim();
+    if (!v) continue;
+    const withProtocol = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+    try {
+      return new URL(withProtocol).origin;
+    } catch {
+      // try the next candidate
+    }
+  }
+  return "https://georgeshandyman.com";
+}
+
 export const site = {
   name: "George's Furniture Assembly & Handyman Services",
   shortName: "George's",
   tagline: "Furniture Assembly · Handyman Services",
   description:
     "Furniture assembly, TV mounting, ceiling fans, kitchen cabinets, painting, power washing, landscaping and Home Depot services — serving Ridgeville, SC and everywhere within 75 miles. Free quotes, upfront pricing.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://georgeshandyman.com",
+  url: resolveSiteUrl(),
 
   phone: "843-471-8651",
   phoneHref: "tel:+18434718651",
